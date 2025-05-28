@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Deepfake Detector</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Deepfake Detector</h1>
+    <p>Upload an image or video to find out whether it's real or fake.</p>
+
+    <form id="upload-form" method="POST" enctype="multipart/form-data">
+      <label class="upload-btn">
+        Choose File
+        <input type="file" name="file" id="file-input" required onchange="previewFile()">
+      </label>
+      <button type="submit">Detect</button>
+    </form>
+
+    <!-- Preview Area -->
+    <div id="preview-container"></div>
+
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="spinner hidden"></div>
+
+    <!-- Result -->
+    {% if result %}
+      <div class="result-box {{ result|lower }}">
+        <h2>Result: {{ result }}</h2>
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    const form = document.getElementById('upload-form');
+    const spinner = document.getElementById('loading-spinner');
+
+    form.addEventListener('submit', () => {
+      spinner.classList.remove('hidden');
+    });
+
+    function previewFile() {
+      const previewContainer = document.getElementById('preview-container');
+      previewContainer.innerHTML = '';
+      const file = document.getElementById('file-input').files[0];
+      if (!file) return;
+
+      const fileType = file.type;
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        if (fileType.startsWith('image')) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.className = 'preview-image';
+          previewContainer.appendChild(img);
+        } else if (fileType.startsWith('video')) {
+          const video = document.createElement('video');
+          video.src = e.target.result;
+          video.controls = true;
+          video.className = 'preview-video';
+          previewContainer.appendChild(video);
+        }
+      };
+
+      reader.readAsDataURL(file);
+    }
+  </script>
+</body>
+</html>
